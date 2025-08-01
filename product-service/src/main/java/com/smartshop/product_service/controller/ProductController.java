@@ -20,7 +20,7 @@ public class ProductController {
     @PostMapping()
     public ResponseEntity<ProductEntity> createProduct(@RequestBody CreateProductRequestDTO createProductRequestDTO){
         ProductEntity saved=productService.createProduct(createProductRequestDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+        return ResponseEntity.status(HttpStatus.OK).body(saved);
     }
 
     @GetMapping("/id")
