@@ -1,5 +1,6 @@
 package com.smartshop.order_service.service;
 
+import com.smartshop.order_service.dto.InventoryResponseDTO;
 import com.smartshop.order_service.dto.OrderLineItemsDTO;
 import com.smartshop.order_service.dto.OrderRequestDTO;
 import com.smartshop.order_service.dto.OrderResponseDTO;
@@ -7,17 +8,22 @@ import com.smartshop.order_service.model.OrderEntity;
 import com.smartshop.order_service.model.OrderLineItemEntity;
 import com.smartshop.order_service.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private final WebClient webClient;
 
     public void createOrder(OrderRequestDTO orderRequestDTO) {
         OrderEntity orderEntity=OrderEntity.builder()
@@ -27,8 +33,26 @@ public class OrderService {
                         .map(this::convertToEntity)
                         .toList())
                 .build();
-        orderRepository.save(orderEntity);
 
+        List<String> skuCodes=orderEntity.getOrderLineItemsList().stream().map(OrderLineItemEntity::getSkuCode).toList();
+
+        InventoryResponseDTO[] inventoryResponseDTOListArray=webClient.get()
+                        .uri("http://localhost:8082/api/inventory",
+                                uriBuilder -> uriBuilder.queryParam("sku-codes", skuCodes).build())
+                        .retrieve()
+                        .bodyToMono(InventoryResponseDTO[].class)
+                        .block();
+
+        boolean allProductsInStock=Arrays.stream(inventoryResponseDTOListArray)
+                .allMatch(InventoryResponseDTO::getIsInStock);
+
+        log.info("Value of the allProductsInStock is :{}",allProductsInStock);
+
+        if(allProductsInStock){
+            orderRepository.save(orderEntity);
+        }else{
+            throw new IllegalArgumentException("Item quantity is 0");
+        }
     }
     public OrderLineItemEntity convertToEntity(OrderLineItemsDTO orderLineItemsDTO){
         return OrderLineItemEntity.builder()

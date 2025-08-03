@@ -1,14 +1,17 @@
 package com.smartshop.inventory_service.service;
 
-import com.smartshop.inventory_service.dto.InventoryRequestDTO;
 import com.smartshop.inventory_service.dto.InventoryResponseDTO;
 import com.smartshop.inventory_service.entity.InventoryEntity;
 import com.smartshop.inventory_service.repository.InventoryRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 
+@Slf4j
 @Service
 public class InventoryService {
 
@@ -39,8 +42,13 @@ public class InventoryService {
 //                .build();
 //    }
 
-
-    public boolean getIsInStock(String skuCode){
-       return inventoryRepository.findBySkuCode(skuCode).isPresent();
+    @Transactional(readOnly = true )
+    public List<InventoryResponseDTO> getIsInStock( List<String> skuCodeList){
+        List<InventoryEntity> inventoryEntities=inventoryRepository.findBySkuCodeIn(skuCodeList);
+        return inventoryEntities.stream().map(inventoryEntity-> InventoryResponseDTO.builder()
+                .isInStock((inventoryEntity.getQuantity()>0))
+                .skuCode(inventoryEntity.getSkuCode())
+                .build()).toList();
     }
+
 }

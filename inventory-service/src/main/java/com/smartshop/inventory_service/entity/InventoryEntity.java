@@ -20,6 +20,6 @@ public class InventoryEntity {
     private Long id;
 
     private String  skuCode;
-    private BigDecimal quantity;
+    private Integer quantity;
 
 }
