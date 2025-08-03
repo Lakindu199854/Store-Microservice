@@ -21,11 +21,11 @@ public class InventoryServiceApplication {
 		return args -> {
 			InventoryEntity inventoryEntity1 = new InventoryEntity();
 			inventoryEntity1.setSkuCode("Iphone 13");
-			inventoryEntity1.setQuantity(BigDecimal.valueOf(10));
+			inventoryEntity1.setQuantity(10);
 
 			InventoryEntity inventoryEntity2 = new InventoryEntity();
 			inventoryEntity2.setSkuCode("Iphone 14");
-			inventoryEntity2.setQuantity(BigDecimal.valueOf(0));
+			inventoryEntity2.setQuantity(0);
 
 			inventoryRepository.save(inventoryEntity1);
 			inventoryRepository.save(inventoryEntity2);

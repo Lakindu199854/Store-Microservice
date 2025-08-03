@@ -20,10 +20,14 @@ public class OrderController {
 
     @PostMapping
     public ResponseEntity<?> createOrder(@RequestBody OrderRequestDTO orderRequestDTO){
-         orderService.createOrder(orderRequestDTO);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body("Order created successfully");
+        try{
+            orderService.createOrder(orderRequestDTO);
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body("Order created successfully");
+        }catch(Exception ex){
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
 
     }
 
