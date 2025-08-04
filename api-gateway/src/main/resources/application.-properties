@@ -1,0 +1,12 @@
+spring.application.name=api-gateway
+
+#Where the clients can find the Eureka server
+eureka.client.serviceUrl.defaultZone=http://localhost:8761/eureka
+
+logging.level.root=INFO
+
+#Logs how the routes are configed and loaded
+logging.level.org.springframework.cloud.gateway.route.RouteDefinitionLocator=INFO
+
+#Very detailed logging for debugging routing issues or custom gateway filters.
+logging.level.org.springframework.cloud.gateway=TRACE
